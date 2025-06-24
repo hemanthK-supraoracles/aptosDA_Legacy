@@ -1,0 +1,3 @@
+
+ aptos init --network testnet --profile ww1 
+Aptos CLI is now set up for account 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5 as profile ww1!

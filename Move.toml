@@ -1,0 +1,22 @@
+[package]
+name = "aptosDA_Legacy"
+version = "1.0.0"
+authors = []
+
+[addresses]
+MOON = "0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5"
+
+[dev-addresses]
+
+[dependencies.AptosFramework]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "46bf426662e4dc1b9e7317fc7fc66594bfaf6edb"
+subdir = "aptos-move/framework/aptos-framework"
+
+
+[dependencies.AptosToken]
+git = "https://github.com/aptos-labs/aptos-core.git"
+rev = "main"
+subdir = "aptos-move/framework/aptos-token"
+
+[dev-dependencies]
