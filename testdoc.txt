@@ -1,3 +1,85 @@
 
  aptos init --network testnet --profile ww1 
 Aptos CLI is now set up for account 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5 as profile ww1!
+
+Aptos CLI is now set up for account 0x04e40f8fa1be06fd0b9cd95588bfe355914ac948adcce9a28524fc4829bc910e as profile ww2!
+
+Aptos CLI is now set up for account 0x4b5d31d8daea0f36f17aaf486571f480a60e8dcd46c960dedb342340a00549b6 as profile ww3!
+
+Aptos CLI is now set up for account 0xd7ec61207873e428fe58fd87eb68d906ccfff36b9d1ee2c47c2c275f1b7597cf as profile ww4!
+
+
+
+aptos move compile --named-addresses MOON=0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5
+
+aptos move publish --url https://fullnode.testnet.aptoslabs.com/v1 --named-addresses MOON=0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5 --profile ww1
+
+Transaction submitted: https://explorer.aptoslabs.com/txn/0xded86d15bd7b80591ed9e0994d26507784ff14d810c7434ffe24df214357682d?network=testnet
+{
+  "Result": {
+    "transaction_hash": "0xded86d15bd7b80591ed9e0994d26507784ff14d810c7434ffe24df214357682d",
+    "gas_used": 3033,
+    "gas_unit_price": 100,
+    "sender": "ae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5",
+    "sequence_number": 0,
+    "success": true,
+    "timestamp_us": 1750831568464426,
+    "version": 6793676853,
+    "vm_status": "Executed successfully"
+  }
+}
+
+aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::initialize_collection_and_create_token  --args string:"TEST COLLECTION NAME X1" string:"TEST COLLECTION DESCRIPTION X1" string:"https://cdn.britannica.com/88/588-050-07CF1220/lesser-flamingo-phoeniconaias-minor-namibia.jpg" string:"TEST TOKEN NAME X1" string:"TEST TOKEN DESCRIPTION X1" string:"https://example.com/nft.png" u64:30 u64:90  --profile ww1
+https://explorer.aptoslabs.com/txn/0xc4075e9965535b65e092ba47a681e1e8d99db69faa57187a7c63d96fb1baf17f?network=testnet
+
+
+
+aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::mint_token --args string:"TEST COLLECTION NAME X1" string:"TEST TOKEN NAME X1" u64:23 --profile ww1
+https://explorer.aptoslabs.com/txn/0xeb8939df98d5c80d65cedae009fa365a2250c914b10d5fc870ae1c44a819d7ba?network=testnet
+
+
+aptos move run --function-id 0x3::token::opt_in_direct_transfer --args bool:true --profile ww2
+https://explorer.aptoslabs.com/txn/0xfd936ee5399fdf0c198d253608924a54ad5a23cc6fc48aafb7da0883c646e7b9?network=testnet
+
+
+aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::transfer_token --args address:0x04e40f8fa1be06fd0b9cd95588bfe355914ac948adcce9a28524fc4829bc910e  string:"TEST COLLECTION NAME X1" string:"TEST TOKEN NAME X1" u64:13 --profile ww1
+https://explorer.aptoslabs.com/txn/0xd22e01cbb00740dcffa884fab19944ae69bf6182c5453fd0d751117105a92fee?network=testnet
+
+
+
+
+*********************************************************************************************************************************************************
+*********************************************************************************************************************************************************
+*********************************************************************************************************************************************************
+
+
+ aptos move publish --url https://fullnode.testnet.aptoslabs.com/v1 --named-addresses MOON=0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5 --profile ww1
+ https://explorer.aptoslabs.com/txn/0x61102b6f2a0d9ed85192236ff20f4315d2af1bacd40db593fceddf45b15922d6?network=testnet
+
+
+ aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::initialize_collection_and_create_token  --args string:"TEST COLLECTION NAME Y1" string:"TEST COLLECTION DESCRIPTION Y1" string:"https://cdn.britannica.com/88/588-050-07CF1220/lesser-flamingo-phoeniconaias-minor-namibia.jpg" string:"TEST TOKEN NAME Y1" string:"TEST TOKEN DESCRIPTION Y1" string:"https://example.com/nft.png" u64:35 u64:98  --profile ww1
+https://explorer.aptoslabs.com/txn/0x4bd53af6daeceacfc51a7e90dfd3c5d5811037b7f3b2bd033d5b1a8e37f15213?network=testnet
+
+
+
+aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::mint_token --args string:"TEST COLLECTION NAME Y1" string:"TEST TOKEN NAME Y1" u64:21 --profile ww1
+ https://explorer.aptoslabs.com/txn/0x5a408e3874c280c09190195c40b0cfcb79515a8c87c41c3d6a89af5f9628a018?network=testnet
+
+
+
+ // MAKE SURE OPT IN IS TRUE FOR RECEIVER
+
+ aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::transfer_token --args address:0x04e40f8fa1be06fd0b9cd95588bfe355914ac948adcce9a28524fc4829bc910e  string:"TEST COLLECTION NAME Y1" string:"TEST TOKEN NAME Y1" u64:12 --profile ww1
+ https://explorer.aptoslabs.com/txn/0x1f0b0343724e97d43c1a453830b2d9a76bf0b2a41867ac99fb2ca635b7ee9ba2?network=testnet
+
+
+aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::burn_token --args u64:5 string:"TEST COLLECTION NAME Y1" string:"TEST TOKEN NAME Y1" u64:0 --profile ww2
+https://explorer.aptoslabs.com/txn/0x60511d4fa5e779f96e19aa8c67d20d48917f188f70816ccc19236e2f6e995dc7?network=testnet
+
+
+aptos move view --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::get_token_balance --args address:0x04e40f8fa1be06fd0b9cd95588bfe355914ac948adcce9a28524fc4829bc910e  string:"TEST COLLECTION NAME Y1" string:"TEST TOKEN NAME Y1" --profile ww1
+
+
+aptos move run --function-id 0xae75d2ff4a164c3fcb1779c1619ae385b3c03a75b90474ffec5422c091a382f5::token_management::mutate_token_properties --args string:"TEST COLLECTION NAME Y1" string:"TEST TOKEN NAME Y1" string:"MODIFIED DESCRIPTION" string:"MODIFIED URI" u64:77 --profile ww1
+https://explorer.aptoslabs.com/txn/0x3304b72c8beba0bb660b8939a4f100b5cc82cb42a0dd54571e025f51361ac4bf?network=testnet
+

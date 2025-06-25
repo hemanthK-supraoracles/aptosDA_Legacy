@@ -2,7 +2,9 @@ module MOON::token_management {
     use std::signer;
     use std::vector;
     use std::option;
-    use std::string::{String};
+    use std::string::{Self, String};
+    use std::debug;
+    use std::bcs;
     use 0x3::token::{Self, TokenDataId};
 
     /// Error codes
@@ -11,6 +13,10 @@ module MOON::token_management {
     const E_INSUFFICIENT_BALANCE: u64 = 3;
     const E_INSUFFICIENT_TOKEN_BALANCE: u64 = 4;
     const E_TOKEN_ALREADY_EXISTS: u64 = 5;
+
+    const BURNABLE_BY_CREATOR: vector<u8> = b"TOKEN_BURNABLE_BY_CREATOR";
+    const BURNABLE_BY_OWNER: vector<u8> = b"TOKEN_BURNABLE_BY_OWNER";
+    const TOKEN_PROPERTY_MUTABLE: vector<u8> = b"TOKEN_PROPERTY_MUTATBLE";
 
     /// Resource to store token management data
     struct TokenManager has key {
@@ -27,35 +33,20 @@ module MOON::token_management {
         token_name: String,
         token_description: String,
         token_uri: String,
-        maximum: u64
+        maximum_collection: u64,
+        maximum_token: u64
     ) acquires TokenManager {
         let creator = signer::address_of(account);
 
         assert!(creator == @MOON, E_NOT_AUTHORIZED);
 
-        if (exists<TokenManager>(creator)) {
-            let i = 0;
-            let token_manager = borrow_global<TokenManager>(creator);
-            let length: u64 = vector::length(&token_manager.vec_token_data_id);
-
-            while (i < length) {
-                let token_data_id = vector::borrow(&token_manager.vec_token_data_id, i);
-                let (_creator_address, collection, name) =
-                    token::get_token_data_id_fields(token_data_id);
-                if (collection == collection_name && name == token_name) {
-                    // Token already exists
-                    assert!(false, E_TOKEN_ALREADY_EXISTS);
-                };
-                i = i + 1;
-            };
-        };
         // Create collection
         token::create_collection(
             account,
             collection_name,
             collection_description,
             collection_uri,
-            maximum,
+            maximum_collection,
             vector<bool>[true, true, true]
         );
         let mutate_config = vector<bool>[
@@ -76,15 +67,15 @@ module MOON::token_management {
                 collection_name,
                 token_name,
                 token_description,
-                maximum,
+                maximum_token,
                 token_uri,
                 creator,
                 0, // royalty denominator
                 0, // royalty numerator
                 token_mut,
-                vector<String>[],
-                vector<vector<u8>>[],
-                vector<String>[]
+                vector<String>[string::utf8(BURNABLE_BY_OWNER), string::utf8(BURNABLE_BY_CREATOR), string::utf8(TOKEN_PROPERTY_MUTABLE)],
+                vector<vector<u8>>[bcs::to_bytes<bool>(&true), bcs::to_bytes<bool>(&true), bcs::to_bytes<bool>(&true)],
+                vector<String>[string::utf8(b"bool"), string::utf8(b"bool"), string::utf8(b"bool")]
             );
 
         if (!exists<TokenManager>(creator)) {
@@ -102,7 +93,7 @@ module MOON::token_management {
     }
 
     /// Mint tokens
-    public fun mint_token(
+    public entry fun mint_token(
         account: &signer,
         collection_name: String,
         token_name: String,
@@ -125,9 +116,10 @@ module MOON::token_management {
 
         let token_data_id = find_token_data_id(collection_name, token_name);
 
-        let token_id = token::create_token_id(token_data_id, 1);
+        let token_id = token::create_token_id(token_data_id, 0);
         // Verify balance
         let balance = token::balance_of(signer::address_of(sender), token_id);
+        debug::print(&balance);
         assert!(balance >= amount, E_INSUFFICIENT_TOKEN_BALANCE);
 
         token::transfer(sender, token_id, receiver, amount);
@@ -146,7 +138,7 @@ module MOON::token_management {
 
         let token_data_id = find_token_data_id(collection_name, token_name);
 
-        let token_id = token::create_token_id(token_data_id, 1);
+        let token_id = token::create_token_id(token_data_id, 0);
         // Verify balance
         let balance = token::balance_of(signer::address_of(account), token_id);
         assert!(balance >= amount, E_INSUFFICIENT_TOKEN_BALANCE);
@@ -182,17 +174,28 @@ module MOON::token_management {
 
     }
 
-    #[view]
     /// Get token balance
+    #[view]
     public fun get_token_balance(
         account: address, collection_name: String, token_name: String
     ): u64 acquires TokenManager {
         let token_data_id = find_token_data_id(collection_name, token_name);
-        let token_id = token::create_token_id(token_data_id, 1);
+        let token_id = token::create_token_id(token_data_id, 0);
+
+        let message1 = string::utf8(b"token_id is :");
+        debug::print(&token_id);
 
         let balance = token::balance_of(account, token_id);
 
         balance
+    }
+
+    #[view]
+    public fun get_token_data_id(
+        account: address, collection_name: String, token_name: String
+    ): TokenDataId acquires TokenManager {
+        let token_data_id = find_token_data_id(collection_name, token_name);
+        token_data_id
     }
 
     fun find_token_data_id(
